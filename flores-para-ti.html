@@ -1,0 +1,536 @@
+Flores para ti · HTML
+Copiar
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flores para ti 🌻❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #f5ede0;
+    --brown: #6b3a2a;
+    --brown-mid: #8b4e30;
+    --text: #3a2a1a;
+    --text-light: #7a5a3a;
+  }
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Lora', Georgia, serif;
+    color: var(--text);
+    display: flex; flex-direction: column; align-items: center;
+    overflow-x: hidden;
+  }
+ 
+  /* Floating petals */
+  .bg-petals { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .bg-petals span {
+    position: absolute; opacity: 0;
+    animation: fallPetal linear infinite;
+    font-size: 1rem;
+  }
+  @keyframes fallPetal {
+    0%   { transform: translateY(-60px) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+ 
+  /* Card */
+  .card {
+    position: relative; z-index: 1;
+    background: var(--cream);
+    border-radius: 28px;
+    box-shadow: 0 8px 48px rgba(100,50,20,0.13), 0 2px 8px rgba(100,50,20,0.08);
+    margin: 32px 16px 40px;
+    max-width: 480px; width: 100%;
+    border: 1.5px solid rgba(200,150,80,0.2);
+    overflow: hidden;
+  }
+ 
+  /* INTRO */
+  #intro {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 440px; padding: 48px 32px;
+    cursor: pointer; user-select: none; position: relative;
+  }
+ 
+  .intro-emoji-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: floatFlower 3s ease-in-out infinite;
+    filter: drop-shadow(0 10px 28px rgba(200,130,0,0.45));
+    transition: transform 0.12s;
+    line-height: 1;
+  }
+  .intro-emoji-wrap::after {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 55px;
+    background: linear-gradient(to bottom, #4a9e30, #2d6a1f);
+    border-radius: 5px;
+    margin-top: -4px;
+  }
+  #intro:active .intro-emoji-wrap { transform: scale(0.85) rotate(-10deg); }
+  .intro-emoji-wrap { font-size: 8rem; }
+ 
+  @keyframes floatFlower {
+    0%,100% { transform: translateY(0) rotate(-5deg); }
+    50%      { transform: translateY(-16px) rotate(5deg); }
+  }
+  .intro-label {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1.4rem; color: var(--brown-mid);
+    margin-top: 24px; letter-spacing: 0.02em;
+    border-bottom: 1.5px solid rgba(180,110,40,0.3); padding-bottom: 5px;
+  }
+  .tap-hint {
+    font-size: 0.78rem; color: var(--text-light);
+    margin-top: 14px; opacity: 0.65;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:.65} 50%{opacity:.15} }
+  .ripple-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; overflow: hidden; border-radius: 28px;
+  }
+  .ripple-circle {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: rgba(220,170,40,0.4);
+    transform: scale(0); opacity: 0;
+  }
+  .ripple-circle.go { animation: ripOut 0.55s ease-out forwards; }
+  @keyframes ripOut { to { transform: scale(55); opacity: 0; } }
+ 
+  /* MAIN */
+  #main { display: none; flex-direction: column; padding: 28px 24px 32px; }
+ 
+  .scene {
+    position: relative; width: 100%; height: 340px; margin-bottom: 18px;
+  }
+  /* Canvas fills the scene */
+  #scene-canvas {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+ 
+  /* Text */
+  .title-line {
+    font-family: 'Playfair Display', serif; font-size: 1.12rem; font-weight: 600;
+    color: var(--brown); margin-bottom: 13px; line-height: 1.45;
+    opacity: 0; transform: translateY(12px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .title-line.show { opacity: 1; transform: translateY(0); }
+  .phrase {
+    font-size: 0.95rem; color: var(--text); line-height: 1.75; margin-bottom: 11px;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .phrase.show { opacity: 1; transform: translateY(0); }
+  .signature {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    color: var(--brown-mid); font-size: 1rem; margin: 4px 0 16px 10px;
+    opacity: 0; transition: opacity 0.7s;
+  }
+  .signature.show { opacity: 1; }
+  .deco-flowers {
+    display: flex; gap: 8px; margin: 2px 0 18px 8px;
+    opacity: 0; transition: opacity 0.7s;
+  }
+  .deco-flowers.show { opacity: 1; }
+  .deco-flowers canvas { animation: sway 3s ease-in-out infinite; }
+  .deco-flowers canvas:nth-child(2) { animation-delay: 0.6s; }
+  @keyframes sway { 0%,100%{transform:rotate(-9deg)} 50%{transform:rotate(9deg)} }
+</style>
+</head>
+<body>
+ 
+<div class="bg-petals" id="bgPetals"></div>
+ 
+<div class="card">
+ 
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="ripple-overlay"><div class="ripple-circle" id="ripple"></div></div>
+    <div class="intro-emoji-wrap">🌻</div>
+    <div class="intro-label">Flores Para Ti</div>
+    <div class="tap-hint">Toca para abrir ✨</div>
+  </div>
+ 
+  <!-- MAIN -->
+  <div id="main">
+    <div class="scene">
+      <canvas id="scene-canvas"></canvas>
+    </div>
+    <div>
+      <p class="title-line" id="t1">Girasoles para mi mejor amiga:</p>
+      <p class="phrase"     id="t2">Da igual cuantas veces pases por malos ratos que siempre voy a estar a tu lado.</p>
+      <p class="signature"  id="t4">— Te quiero ahora y siempre 💛</p>
+      <div class="deco-flowers" id="decoFlowers">
+        <canvas class="deco-sf" width="40" height="40"></canvas>
+        <canvas class="deco-sf" width="40" height="40"></canvas>
+      </div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<script>
+// ═══════════════════════════════════════════════
+// DRAW SUNFLOWER on a canvas context
+// cx, cy = center; r = total radius (petals tip)
+// ═══════════════════════════════════════════════
+ 
+ 
+function drawSunflower(ctx, cx, cy, r, rotation) {
+  rotation = rotation || 0;
+  // r = true outer radius (tip of longest petal from center)
+  // coreR is 32% of r; petal tip reaches exactly r from center
+  const coreR     = r * 0.32;
+  const numPetals = 16;
+  // petal ellipse: center at dist (coreR + halfLen), semi-height halfLen, tip = coreR + 2*halfLen = r
+  // → halfLen = (r - coreR) / 2
+  const halfLen1  = (r - coreR) / 2;           // layer 1 (outer)
+  const halfLen2  = halfLen1 * 0.82;            // layer 2 (inner, shorter)
+  const halfW1    = r * 0.13;
+  const halfW2    = halfW1 * 0.78;
+ 
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+ 
+  // Petals — two layers, offset by half a step
+  for (let layer = 0; layer < 2; layer++) {
+    const offset   = layer * (Math.PI / numPetals);
+    const halfLen  = layer === 0 ? halfLen1 : halfLen2;
+    const halfW    = layer === 0 ? halfW1   : halfW2;
+    const dist     = coreR + halfLen;           // center of ellipse from origin
+    const col1     = layer === 0 ? '#f5c518' : '#e8ad00';
+    const col2     = layer === 0 ? '#f0b800' : '#d49a00';
+ 
+    for (let i = 0; i < numPetals; i++) {
+      const angle = offset + (i / numPetals) * Math.PI * 2;
+      ctx.save();
+      ctx.rotate(angle);
+ 
+      const grad = ctx.createLinearGradient(0, -(dist + halfLen), 0, -(dist - halfLen));
+      grad.addColorStop(0,   i % 2 === 0 ? col1 : col2);
+      grad.addColorStop(0.4, '#fdd835');
+      grad.addColorStop(1,   '#e6a800');
+ 
+      ctx.beginPath();
+      ctx.ellipse(0, -dist, halfW, halfLen, 0, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+ 
+  // Core outer ring (dark brown)
+  const coreGrad = ctx.createRadialGradient(0, 0, coreR * 0.1, 0, 0, coreR);
+  coreGrad.addColorStop(0,   '#1a0800');
+  coreGrad.addColorStop(0.5, '#2e1200');
+  coreGrad.addColorStop(0.8, '#3d1800');
+  coreGrad.addColorStop(1,   '#5a2800');
+  ctx.beginPath();
+  ctx.arc(0, 0, coreR, 0, Math.PI * 2);
+  ctx.fillStyle = coreGrad;
+  ctx.fill();
+ 
+  // Seed pattern — small dots arranged in Fibonacci-ish spiral
+  const seedCount = Math.max(12, Math.floor(coreR * coreR * 0.9));
+  const goldenAngle = 2.399963; // radians
+  for (let s = 0; s < seedCount; s++) {
+    const frac  = s / seedCount;
+    const sr    = Math.sqrt(frac) * coreR * 0.88;
+    const sa    = s * goldenAngle;
+    const sx    = sr * Math.cos(sa);
+    const sy    = sr * Math.sin(sa);
+    const sdot  = coreR * 0.085;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sdot, 0, Math.PI * 2);
+    // alternating seed colours
+    ctx.fillStyle = s % 3 === 0 ? '#6b3200' : (s % 3 === 1 ? '#4a2000' : '#7a3a00');
+    ctx.fill();
+  }
+ 
+  // Tiny central highlight
+  ctx.beginPath();
+  ctx.arc(0, 0, coreR * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,200,80,0.12)';
+  ctx.fill();
+ 
+  ctx.restore();
+}
+ 
+ 
+ 
+// ── Draw deco small flowers ──
+document.querySelectorAll('.deco-sf').forEach((c, i) => {
+  const ctx = c.getContext('2d');
+  drawSunflower(ctx, 20, 20, 16, i * 0.4);
+});
+ 
+// ── Background petals ──
+const bgEl = document.getElementById('bgPetals');
+for (let i = 0; i < 16; i++) {
+  const c   = document.createElement('canvas');
+  const sz  = 20 + Math.random() * 14;
+  const pad = sz * 0.15;
+  c.width   = sz + pad*2; c.height = sz + pad*2;
+  drawSunflower(c.getContext('2d'), c.width/2, c.height/2, sz/2 * 0.88, Math.random() * Math.PI * 2);
+  const wrap = document.createElement('span');
+  wrap.appendChild(c);
+  wrap.style.left               = (Math.random() * 100) + '%';
+  wrap.style.animationDuration  = (9 + Math.random() * 14) + 's';
+  wrap.style.animationDelay     = (Math.random() * 16) + 's';
+  bgEl.appendChild(wrap);
+}
+ 
+// ═══════════════════════════════════════════════
+// SCENE CANVAS — tree + heart
+// ═══════════════════════════════════════════════
+const sceneCanvas = document.getElementById('scene-canvas');
+const sctx        = sceneCanvas.getContext('2d');
+let   sceneW      = 0, sceneH = 0;
+ 
+function resizeScene() {
+  const rect  = sceneCanvas.parentElement.getBoundingClientRect();
+  sceneW      = rect.width  || 440;
+  sceneH      = rect.height || 340;
+  sceneCanvas.width  = sceneW;
+  sceneCanvas.height = sceneH;
+}
+ 
+// Heart points (parametric)
+function heartPts(n, scale) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * 2 * Math.PI;
+    pts.push({
+      x: scale * 16 * Math.pow(Math.sin(t), 3),
+      y: -scale * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t))
+    });
+  }
+  return pts;
+}
+ 
+// Build flower positions
+function buildFlowerPoints() {
+  return [
+    ...heartPts(44, 8.6),
+    ...heartPts(34, 6.3),
+    ...heartPts(24, 4.3),
+    ...heartPts(14, 2.6),
+    ...heartPts(6,  1.1),
+  ].map(p => ({
+    ...p,
+    r:   9 + Math.random() * 5,          // flower radius
+    rot: Math.random() * Math.PI * 2,    // random rotation
+    delay: Math.random()                 // bloom order randomness
+  }));
+}
+ 
+// Tree drawing — using canvas paths
+function drawTreeFrame(ctx, w, h, progress) {
+  // progress 0→1: trunk grows, then branches
+  const cx     = w / 2 + 20;
+  const bottom = h;
+ 
+  // Helper: draw a tapered bezier branch up to t (0-1)
+  function drawBranch(x1,y1, cx1,cy1, x2,y2, t, lineW, color) {
+    if (t <= 0) return;
+    const tx  = x1 + (cx1-x1)*t*t + (x2-cx1)*t*(1-t)*0 ; // rough
+    // Use getPointAtLength approximation via parametric
+    const bx = (1-t)*(1-t)*x1 + 2*(1-t)*t*cx1 + t*t*x2;
+    const by = (1-t)*(1-t)*y1 + 2*(1-t)*t*cy1 + t*t*y2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.quadraticCurveTo(
+      x1 + (cx1-x1)*t, y1 + (cy1-y1)*t,
+      bx, by
+    );
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = lineW;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+  }
+ 
+  // Ground shadow
+  ctx.beginPath();
+  ctx.ellipse(cx, bottom - 4, 34, 6, 0, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(180,130,80,0.25)';
+  ctx.fill();
+ 
+  const trunkProg   = Math.min(1, progress / 0.25);
+  const branch1Prog = Math.max(0, Math.min(1, (progress - 0.25) / 0.2));
+  const branch2Prog = Math.max(0, Math.min(1, (progress - 0.38) / 0.2));
+  const branch3Prog = Math.max(0, Math.min(1, (progress - 0.50) / 0.35));
+ 
+  // Trunk
+  const trunkTopY = bottom - 100;
+  const trunkTopX = cx + 0;
+  if (trunkProg > 0) {
+    const ty = bottom + (trunkTopY - bottom) * trunkProg;
+    const grad = ctx.createLinearGradient(cx-7, 0, cx+7, 0);
+    grad.addColorStop(0,   '#5a2e1a');
+    grad.addColorStop(0.5, '#8b4e30');
+    grad.addColorStop(1,   '#5a2e1a');
+    ctx.beginPath();
+    ctx.moveTo(cx - 5, bottom);
+    ctx.quadraticCurveTo(cx - 4, bottom - 50, cx + 2, ty);
+    ctx.lineWidth   = 13;
+    ctx.strokeStyle = grad;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+  }
+ 
+  if (trunkProg < 1) return;
+ 
+  // Main branches (3)
+  drawBranch(cx, trunkTopY,  cx+12, trunkTopY-28, cx+26, trunkTopY-47, branch1Prog, 7, '#7a3e22');
+  drawBranch(cx, trunkTopY,  cx-12, trunkTopY-28, cx-26, trunkTopY-47, branch1Prog, 7, '#7a3e22');
+  drawBranch(cx, trunkTopY,  cx,    trunkTopY-30, cx,    trunkTopY-52, branch1Prog, 6, '#7a3e22');
+ 
+  if (branch1Prog < 1) return;
+ 
+  // Sub-branches right
+  drawBranch(cx+26, trunkTopY-47, cx+38, trunkTopY-62, cx+46, trunkTopY-75, branch2Prog, 4,   '#6b3a22');
+  drawBranch(cx+26, trunkTopY-47, cx+34, trunkTopY-57, cx+36, trunkTopY-70, branch2Prog, 3.2, '#6b3a22');
+  drawBranch(cx+26, trunkTopY-47, cx+22, trunkTopY-62, cx+24, trunkTopY-77, branch2Prog, 2.8, '#6b3a22');
+  // Sub-branches left
+  drawBranch(cx-26, trunkTopY-47, cx-38, trunkTopY-62, cx-46, trunkTopY-75, branch2Prog, 4,   '#6b3a22');
+  drawBranch(cx-26, trunkTopY-47, cx-34, trunkTopY-57, cx-36, trunkTopY-70, branch2Prog, 3.2, '#6b3a22');
+  drawBranch(cx-26, trunkTopY-47, cx-22, trunkTopY-62, cx-24, trunkTopY-77, branch2Prog, 2.8, '#6b3a22');
+  // Sub-branches center
+  drawBranch(cx, trunkTopY-52, cx+6,  trunkTopY-67, cx+8,  trunkTopY-83, branch2Prog, 3,   '#6b3a22');
+  drawBranch(cx, trunkTopY-52, cx-6,  trunkTopY-67, cx-8,  trunkTopY-83, branch2Prog, 2.6, '#6b3a22');
+ 
+  if (branch2Prog < 1) return;
+ 
+  // Tips
+  drawBranch(cx+46,trunkTopY-75, cx+50,trunkTopY-85, cx+52,trunkTopY-93, branch3Prog, 2.2, '#5a3018');
+  drawBranch(cx+46,trunkTopY-75, cx+48,trunkTopY-83, cx+50,trunkTopY-92, branch3Prog, 1.8, '#5a3018');
+  drawBranch(cx-46,trunkTopY-75, cx-50,trunkTopY-85, cx-52,trunkTopY-93, branch3Prog, 2.2, '#5a3018');
+  drawBranch(cx-46,trunkTopY-75, cx-48,trunkTopY-83, cx-50,trunkTopY-92, branch3Prog, 1.8, '#5a3018');
+  drawBranch(cx+8, trunkTopY-83, cx+11,trunkTopY-93, cx+10,trunkTopY-103,branch3Prog, 1.8, '#5a3018');
+  drawBranch(cx-8, trunkTopY-83, cx-11,trunkTopY-93, cx-10,trunkTopY-103,branch3Prog, 1.8, '#5a3018');
+}
+ 
+// ── Animation state ──
+let flowerPoints   = [];
+let bloomedCount   = 0;
+let treeProgress   = 0;
+let phase          = 'idle'; // idle | tree | flowers | done
+let heartCX        = 0;
+let heartCY        = 0;
+ 
+function initScene() {
+  resizeScene();
+  heartCX = sceneW / 2 + 20;
+  heartCY = sceneH * 0.40;
+  flowerPoints = buildFlowerPoints();
+  // Sort by delay for bloom order
+  flowerPoints.sort((a,b) => a.delay - b.delay);
+}
+ 
+let lastTime = null;
+function animate(ts) {
+  if (!lastTime) lastTime = ts;
+  const dt = (ts - lastTime) / 1000;
+  lastTime  = ts;
+ 
+  sctx.clearRect(0, 0, sceneW, sceneH);
+ 
+  if (phase === 'tree') {
+    treeProgress = Math.min(1, treeProgress + dt * 0.72);
+    drawTreeFrame(sctx, sceneW, sceneH, treeProgress);
+    if (treeProgress >= 1) { phase = 'flowers'; }
+    requestAnimationFrame(animate);
+  }
+  else if (phase === 'flowers') {
+    drawTreeFrame(sctx, sceneW, sceneH, 1);
+    // Bloom ~6 new flowers per frame
+    const toBloom = Math.min(flowerPoints.length, bloomedCount + 6);
+    bloomedCount  = toBloom;
+    for (let i = 0; i < bloomedCount; i++) {
+      const fp = flowerPoints[i];
+      drawSunflower(sctx, heartCX + fp.x, heartCY + fp.y, fp.r, fp.rot);
+    }
+    if (bloomedCount < flowerPoints.length) {
+      requestAnimationFrame(animate);
+    } else {
+      phase = 'done';
+      showText();
+    }
+  }
+  else if (phase === 'done') {
+    drawTreeFrame(sctx, sceneW, sceneH, 1);
+    for (let i = 0; i < flowerPoints.length; i++) {
+      const fp = flowerPoints[i];
+      drawSunflower(sctx, heartCX + fp.x, heartCY + fp.y, fp.r, fp.rot);
+    }
+  }
+}
+ 
+// ── Text reveal ──
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function show(id)  { document.getElementById(id)?.classList.add('show'); }
+ 
+async function showText() {
+  await delay(300);
+  show('t1'); await delay(420);
+  show('t2'); await delay(440);
+  show('t4'); await delay(330);
+  show('decoFlowers');
+}
+ 
+// ── Start ──
+let sceneStarted = false;
+function startScene(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  if (sceneStarted) return;
+  sceneStarted = true;
+ 
+  const rEl = document.getElementById('ripple');
+  rEl.classList.remove('go'); void rEl.offsetWidth; rEl.classList.add('go');
+  setTimeout(() => {
+    document.getElementById('intro').style.display = 'none';
+    const main = document.getElementById('main');
+    main.style.display = 'flex';
+    initScene();
+    phase = 'tree';
+    requestAnimationFrame(animate);
+  }, 380);
+}
+ 
+// Attach both touch and click so it works on mobile AND desktop
+const introEl = document.getElementById('intro');
+introEl.addEventListener('touchend',  startScene, { passive: false });
+introEl.addEventListener('click',     startScene);
+ 
+// ── Ripple on resize ──
+window.addEventListener('resize', () => {
+  if (phase !== 'idle') {
+    initScene();
+    if (phase === 'done') {
+      sctx.clearRect(0, 0, sceneW, sceneH);
+      drawTreeFrame(sctx, sceneW, sceneH, 1);
+      for (const fp of flowerPoints) {
+        drawSunflower(sctx, heartCX + fp.x, heartCY + fp.y, fp.r, fp.rot);
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
