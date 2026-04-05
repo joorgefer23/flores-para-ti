@@ -66,15 +66,7 @@
     transition: transform 0.12s;
     line-height: 1;
   }
-  .intro-emoji-wrap::after {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 55px;
-    background: linear-gradient(to bottom, #4a9e30, #2d6a1f);
-    border-radius: 5px;
-    margin-top: -4px;
-  }
+  /* Se ha eliminado el tallo verde de aquí */
   #intro:active .intro-emoji-wrap { transform: scale(0.85) rotate(-10deg); }
   .intro-emoji-wrap { font-size: 8rem; }
  
@@ -155,22 +147,20 @@
  
 <div class="card">
  
-  <!-- INTRO -->
   <div id="intro">
     <div class="ripple-overlay"><div class="ripple-circle" id="ripple"></div></div>
     <div class="intro-emoji-wrap">🌻</div>
     <div class="intro-label">Flores Para Ti</div>
     <div class="tap-hint">Toca para abrir ✨</div>
-  </div>
+  }
  
-  <!-- MAIN -->
   <div id="main">
     <div class="scene">
       <canvas id="scene-canvas"></canvas>
     </div>
     <div>
       <p class="title-line" id="t1">Girasoles para mi mejor amiga:</p>
-      <p class="phrase"     id="t2">FELIZ SANTOOO.   Da igual cuantas veces pases por malos ratos que siempre voy a estar a tu lado.</p>
+      <p class="phrase"     id="t2">FELIZ SANTOOO.  Da igual cuantas veces pases por malos ratos que siempre voy a estar a tu lado.</p>
       <p class="signature"  id="t4">— Te quiero ahora y siempre 💛</p>
       <div class="deco-flowers" id="decoFlowers">
         <canvas class="deco-sf" width="40" height="40"></canvas>
@@ -297,8 +287,8 @@ for (let i = 0; i < 16; i++) {
 // SCENE CANVAS — tree + heart
 // ═══════════════════════════════════════════════
 const sceneCanvas = document.getElementById('scene-canvas');
-const sctx        = sceneCanvas.getContext('2d');
-let   sceneW      = 0, sceneH = 0;
+const sctx         = sceneCanvas.getContext('2d');
+let   sceneW       = 0, sceneH = 0;
  
 function resizeScene() {
   const rect  = sceneCanvas.parentElement.getBoundingClientRect();
